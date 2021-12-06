@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { NextPage } from "next";
+import { useRouter } from "next/router";
 import { Heading } from "@chakra-ui/react";
 import {
   Button,
@@ -8,8 +9,12 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
+import { useLocalStorage } from "usehooks-ts";
 
 const SignUp: NextPage = () => {
+  const router = useRouter();
+  const [user, setUser] = useLocalStorage("jwt", null);
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -26,9 +31,16 @@ const SignUp: NextPage = () => {
       body: reqBody,
     })
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) => {
+        const jwt = data.data;
+        if (jwt) {
+          setUser(jwt);
+        }
+      });
   };
-  useEffect(() => {}, []);
+
+  useEffect(() => {}, [user, router]);
+
   return (
     <div className="Sign-Up">
       <Heading align="center">Sign Up</Heading>
