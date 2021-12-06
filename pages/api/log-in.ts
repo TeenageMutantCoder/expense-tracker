@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
-import passport from "../../lib/passport";
+import { StatusCodes } from "http-status-codes";
+import dbConnect from "../../lib/dbConnect";
+import User from "../../models/User";
 
 const logInHandler = nc<NextApiRequest, NextApiResponse>({
   onError: (err, req, res, next) => {
@@ -10,10 +12,36 @@ const logInHandler = nc<NextApiRequest, NextApiResponse>({
   onNoMatch: (req, res, next) => {
     res.status(404).end("Page is not found");
   },
-})
-  .use(passport.initialize())
-  .post(passport.authenticate("jwt", { session: false }), (req, res) => {
-    res.send("Hello world");
-  });
+}).post(async (req, res) => {
+  await dbConnect();
+  const { username, password }: { username: string; password: string } =
+    req.body;
+  if (!req.body || !username || !password) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      msg: "Error. Must have JSON object with username and password in request body.",
+    });
+    return;
+  }
+  const user = await User.findOne({ username });
+  if (!user) {
+    res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ msg: `Error. No user with username ${username}` });
+    return;
+  }
+  const passwordIsValid = await user.validatePassword(password);
+  if (!passwordIsValid) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Incorrect password." });
+    return;
+  }
+  const jwtToken = await user.generateToken();
+  res.status(StatusCodes.OK).json({ data: jwtToken });
+});
+
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
 
 export default logInHandler;
