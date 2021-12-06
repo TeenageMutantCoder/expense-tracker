@@ -17,7 +17,7 @@ interface IUserModel extends mongoose.Model<IUserDocument> {
   hashPassword: (password: string) => Promise<string>;
 }
 
-const userSchema = new mongoose.Schema<IUserDocument>({
+const userSchema = new mongoose.Schema<IUserDocument, IUserModel>({
   username: {
     type: String,
     unique: true,
@@ -57,6 +57,6 @@ userSchema.statics.hashPassword = async function (password: string) {
   return hashedPassword;
 };
 
-// https://github.com/vercel/next.js/blob/canary/examples/with-mongodb-mongoose/models/Pet.js
-export default mongoose.models.User ||
+// slightly edited from https://github.com/vercel/next.js/blob/canary/examples/with-mongodb-mongoose/models/Pet.js
+export default (mongoose.models.User as IUserModel) ||
   mongoose.model<IUserDocument, IUserModel>("User", userSchema);

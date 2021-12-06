@@ -24,7 +24,15 @@ const signUpHandler = nc<NextApiRequest, NextApiResponse>({
     });
     return;
   }
-  const user = new User({ username, password });
+  const userExists = await User.exists({ username });
+  if (userExists) {
+    res
+      .status(StatusCodes.FORBIDDEN)
+      .json({ msg: `Error. User already exists with username ${username}.` });
+  }
+  const hashedPassword = await User.hashPassword(password);
+  const user = new User({ username, password: hashedPassword });
+
   const jwtToken = await user.generateToken();
   await user.save();
   res.status(StatusCodes.CREATED).json({ data: jwtToken });
