@@ -39,7 +39,11 @@ const SignUp: NextPage = () => {
       });
   };
 
-  useEffect(() => {}, [user, router]);
+  useEffect(() => {
+    if (user) {
+      router.push("/profile");
+    }
+  }, [user, router]);
 
   return (
     <div className="Sign-Up">

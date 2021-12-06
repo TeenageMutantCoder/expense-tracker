@@ -5,7 +5,12 @@ function Navbar() {
   return (
     <Box bg="gray.100" p={3}>
       <Flex>
-        <Link href="/">Home</Link>
+        <Link href="/" mx={1}>
+          Home
+        </Link>
+        <Link href="/profile" mx={1}>
+          Profile
+        </Link>
         <Spacer />
         <Link href="/log-in" mx={1}>
           Log In
