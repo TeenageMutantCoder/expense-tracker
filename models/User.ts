@@ -8,7 +8,7 @@ export interface IUser {
   expenses?: Array<mongoose.Schema.Types.ObjectId>;
 }
 
-interface IUserDocument extends IUser, mongoose.Document {
+export interface IUserDocument extends IUser, mongoose.Document {
   generateToken: () => Promise<string>;
   validatePassword: (password: string) => Promise<boolean>;
 }
