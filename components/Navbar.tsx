@@ -8,8 +8,8 @@ function Navbar() {
         <Link href="/" mx={1}>
           Home
         </Link>
-        <Link href="/profile" mx={1}>
-          Profile
+        <Link href="/expenses" mx={1}>
+          Expenses
         </Link>
         <Spacer />
         <Link href="/log-in" mx={1}>
