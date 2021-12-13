@@ -41,7 +41,7 @@ const SignUp: NextPage = () => {
 
   useEffect(() => {
     if (user) {
-      router.push("/profile");
+      router.push("/expenses");
     }
   }, [user, router]);
 
