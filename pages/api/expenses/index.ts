@@ -48,7 +48,8 @@ const expenseHandler = nc<NextApiRequest, NextApiResponse>({
           .json({ msg: "Authentication error." });
         return;
       }
-      const expense = new Expense({ ...req.body, user: req.user.id });
+      const expenseData = JSON.parse(req.body);
+      const expense = new Expense({ ...expenseData, user: req.user.id });
       await expense.save();
       res.status(StatusCodes.CREATED).json({ data: expense });
     }

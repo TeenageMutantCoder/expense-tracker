@@ -1,7 +1,13 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Button, Heading } from "@chakra-ui/react";
+import {
+  Button,
+  Heading,
+  FormControl,
+  FormLabel,
+  Input,
+} from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import Expense from "../components/Expense";
 
@@ -9,6 +15,39 @@ const Expenses: NextPage = () => {
   const router = useRouter();
   const [user, setUser] = useLocalStorage("jwt", null);
   const [expenses, setExpenses] = useState([]);
+
+  const createExpense = async (expenseData: {
+    name?: string;
+    cost: number;
+    date?: Date;
+    tags?: string[];
+  }) => {
+    const response = await fetch("/api/expenses", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + user },
+      body: JSON.stringify(expenseData),
+    });
+    if (!response.ok) return;
+    const responseData = await response.json();
+    return responseData.data; // Returns new expense
+  };
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const form = e.currentTarget;
+    const name = form.expenseName.value || undefined;
+    const cost = form.expenseCost.value
+      ? Number(form.expenseCost.value)
+      : undefined;
+    const date = form.expenseDate.value || undefined;
+    let tags = form.expenseTags.value || undefined;
+    if (tags) {
+      // Separates tags by commas and removes extra spaces
+      tags = tags.split(",").map((tag: string) => tag.trim());
+    }
+    // Filter out undefined properties
+    const expenseData = JSON.parse(JSON.stringify({ name, cost, date, tags }));
+    createExpense(expenseData);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -21,7 +60,6 @@ const Expenses: NextPage = () => {
       });
       if (!response.ok) return;
       const responseData = await response.json();
-      if (!response.ok) return;
       return responseData.data;
     }
 
@@ -34,6 +72,41 @@ const Expenses: NextPage = () => {
   return (
     <div className="Expenses">
       <Heading align="center">Expenses</Heading>
+      <form onSubmit={onSubmit}>
+        <FormControl id="expenseName">
+          <FormLabel>Name</FormLabel>
+          <Input
+            type="text"
+            placeholder="Please enter the name of the expense"
+          />
+        </FormControl>
+        <FormControl id="expenseCost" isRequired>
+          <FormLabel>Cost</FormLabel>
+          <Input
+            type="number"
+            min={0.01}
+            step={0.01}
+            placeholder="Please enter the cost of the expense"
+          />
+        </FormControl>
+        <FormControl id="expenseDate">
+          <FormLabel>Date</FormLabel>
+          <Input type="date" />
+        </FormControl>
+        <FormControl id="expenseTags">
+          <FormLabel>Tags</FormLabel>
+          <Input
+            type="text"
+            placeholder="Please enter tags separated by commas (ex: Household, Office, Furniture)"
+          />
+        </FormControl>
+        <Button m={2} colorScheme="teal" variant="solid" type="submit">
+          Create Expense
+        </Button>
+        <Button m={2} colorScheme="teal" variant="outline" type="reset">
+          Clear Data
+        </Button>
+      </form>
       {expenses.length ? (
         expenses.map((expense, index) => <Expense key={index} {...expense} />)
       ) : (
