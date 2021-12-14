@@ -39,7 +39,6 @@ userSchema.methods.generateToken = async function () {
   }
 
   const token = await jwt.sign({}, JWT_SECRET, {
-    expiresIn: "2h",
     audience: ["all"],
     subject: this._id.toString(),
     issuer: "expensetracker",
