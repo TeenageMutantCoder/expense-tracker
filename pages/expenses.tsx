@@ -33,6 +33,7 @@ const Expenses: NextPage = () => {
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const form = e.currentTarget;
     const name = form.expenseName.value || undefined;
     const cost = form.expenseCost.value
@@ -47,6 +48,7 @@ const Expenses: NextPage = () => {
     // Filter out undefined properties
     const expenseData = JSON.parse(JSON.stringify({ name, cost, date, tags }));
     createExpense(expenseData);
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -108,7 +110,25 @@ const Expenses: NextPage = () => {
         </Button>
       </form>
       {expenses.length ? (
-        expenses.map((expense, index) => <Expense key={index} {...expense} />)
+        expenses.map(
+          (
+            expense: {
+              _id: string;
+              cost: number;
+              name?: string;
+              tags?: string[];
+              date?: Date;
+            },
+            index
+          ) => (
+            <Expense
+              expenseId={expense._id}
+              key={index}
+              {...expense}
+              user={user!}
+            />
+          )
+        )
       ) : (
         <p>No expense data</p>
       )}
