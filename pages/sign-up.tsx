@@ -52,15 +52,27 @@ const SignUp: NextPage = () => {
         <form onSubmit={onSubmit}>
           <FormControl id="username" isRequired>
             <FormLabel>Username</FormLabel>
-            <Input type="text" placeholder="Please enter your username" />
+            <Input
+              type="text"
+              autoComplete="username"
+              placeholder="Please enter your username"
+            />
           </FormControl>
           <FormControl id="password-1" isRequired>
             <FormLabel>Password</FormLabel>
-            <Input type="text" placeholder="Please enter your password" />
+            <Input
+              type="text"
+              autoComplete="new-password"
+              placeholder="Please enter your password"
+            />
           </FormControl>
           <FormControl id="password-2" isRequired>
             <FormLabel>Confirm Password</FormLabel>
-            <Input type="text" placeholder="Please re-enter your password" />
+            <Input
+              type="text"
+              autoComplete="new-password"
+              placeholder="Please re-enter your password"
+            />
           </FormControl>
           <Button mt={2} colorScheme="teal" variant="solid" type="submit">
             Sign Up

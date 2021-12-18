@@ -50,11 +50,19 @@ const LogIn: NextPage = () => {
         <form onSubmit={onSubmit}>
           <FormControl id="username" isRequired>
             <FormLabel>Username</FormLabel>
-            <Input type="text" placeholder="Please enter your username" />
+            <Input
+              type="text"
+              autoComplete="username"
+              placeholder="Please enter your username"
+            />
           </FormControl>
           <FormControl id="password" isRequired>
             <FormLabel>Password</FormLabel>
-            <Input type="text" placeholder="Please enter your password" />
+            <Input
+              type="text"
+              autoComplete="current-password"
+              placeholder="Please enter your password"
+            />
           </FormControl>
           <Button mt={2} colorScheme="teal" variant="solid" type="submit">
             Log In
