@@ -4,7 +4,6 @@ import { StatusCodes } from "http-status-codes";
 import passport from "../../../lib/passport";
 import { IUserDocument } from "../../../models/User";
 import Expense from "../../../models/Expense";
-import { read } from "fs";
 
 interface ExtendedRequest {
   user: IUserDocument;
@@ -31,7 +30,17 @@ const expenseIdHandler = nc<NextApiRequest, NextApiResponse>({
         });
         return;
       }
-      const expense = await Expense.findByIdAndDelete(req.query.expenseId);
+      const expense = await Expense.findById(req.query.expenseId);
+
+      // Checks if the user owns the expense
+      if (req.user.id !== String(expense.user)) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          msg: "Authentication error.",
+        });
+        return;
+      }
+
+      await expense.remove();
       res.status(StatusCodes.OK).json({ data: expense });
     }
   );
