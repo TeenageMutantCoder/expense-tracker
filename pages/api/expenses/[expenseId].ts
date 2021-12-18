@@ -43,6 +43,29 @@ const expenseIdHandler = nc<NextApiRequest, NextApiResponse>({
       await expense.remove();
       res.status(StatusCodes.OK).json({ data: expense });
     }
+  )
+  .patch<ExtendedRequest>(
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+      if (!req.user) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          msg: "Authentication error.",
+        });
+        return;
+      }
+      const expense = await Expense.findById(req.query.expenseId);
+
+      // Checks if the user owns the expense
+      if (req.user.id !== String(expense.user)) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          msg: "Authentication error.",
+        });
+        return;
+      }
+
+      await expense.updateOne(JSON.parse(req.body));
+      res.status(StatusCodes.OK).json({ data: expense });
+    }
   );
 
 export const config = {

@@ -36,9 +36,7 @@ const Expenses: NextPage = () => {
     e.preventDefault();
     const form = e.currentTarget;
     const name = form.expenseName.value || undefined;
-    const cost = form.expenseCost.value
-      ? Number(form.expenseCost.value)
-      : undefined;
+    const cost = Number(form.expenseCost.value);
     const date = form.expenseDate.value || undefined;
     let tags = form.expenseTags.value || undefined;
     if (tags) {
@@ -74,7 +72,7 @@ const Expenses: NextPage = () => {
   return (
     <div className="Expenses">
       <Heading align="center">Expenses</Heading>
-      <form onSubmit={onSubmit}>
+      <form autoComplete="off" onSubmit={onSubmit}>
         <FormControl id="expenseName">
           <FormLabel>Name</FormLabel>
           <Input
