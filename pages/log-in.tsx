@@ -10,7 +10,6 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
-import router from "next/router";
 
 const LogIn: NextPage = () => {
   const router = useRouter();
