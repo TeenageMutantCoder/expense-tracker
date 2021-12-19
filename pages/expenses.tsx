@@ -9,7 +9,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
-import Expense from "../components/Expense";
+import Expense from "components/Expense";
 
 const Expenses: NextPage = () => {
   const router = useRouter();

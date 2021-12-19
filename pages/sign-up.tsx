@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Heading } from "@chakra-ui/react";
 import {
   Button,
   Container,
   FormControl,
   FormLabel,
+  Heading,
   Input,
 } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";

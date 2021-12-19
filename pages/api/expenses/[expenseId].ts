@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
 import { StatusCodes } from "http-status-codes";
-import passport from "../../../lib/passport";
-import { IUserDocument } from "../../../models/User";
-import Expense from "../../../models/Expense";
+import passport from "lib/passport";
+import { IUserDocument } from "models/User";
+import Expense from "models/Expense";
 
 interface ExtendedRequest {
   user: IUserDocument;

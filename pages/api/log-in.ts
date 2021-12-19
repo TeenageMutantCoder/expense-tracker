@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
 import { StatusCodes } from "http-status-codes";
-import dbConnect from "../../lib/dbConnect";
-import User from "../../models/User";
+import dbConnect from "lib/dbConnect";
+import User from "models/User";
 
 const logInHandler = nc<NextApiRequest, NextApiResponse>({
   onError: (err, req, res, next) => {
