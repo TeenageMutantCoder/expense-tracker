@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import UserContext from "components/UserContext";
 interface IProps {
-  user: string;
   expenseId: string;
   name?: string;
   cost: number;
@@ -9,13 +9,14 @@ interface IProps {
   tags?: string[];
 }
 
-function Expense({ user, expenseId, name, cost, date, tags }: IProps) {
+function Expense({ expenseId, name, cost, date, tags }: IProps) {
+  const { userToken } = useContext(UserContext);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const deleteExpense = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const response = await fetch(`/api/expenses/${expenseId}`, {
       method: "DELETE",
-      headers: { Authorization: "Bearer " + user },
+      headers: { Authorization: "Bearer " + userToken },
     });
     if (!response.ok) return;
     const responseData = await response.json();
@@ -31,7 +32,7 @@ function Expense({ user, expenseId, name, cost, date, tags }: IProps) {
   }) => {
     const response = await fetch(`/api/expenses/${expenseId}`, {
       method: "PATCH",
-      headers: { Authorization: "Bearer " + user },
+      headers: { Authorization: "Bearer " + userToken },
       body: JSON.stringify(expenseData),
     });
     if (!response.ok) return;

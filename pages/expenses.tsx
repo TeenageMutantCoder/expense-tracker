@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Heading,
@@ -8,12 +8,12 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
-import { useLocalStorage } from "usehooks-ts";
 import Expense from "components/Expense";
+import UserContext from "components/UserContext";
 
 const Expenses: NextPage = () => {
   const router = useRouter();
-  const [user, setUser] = useLocalStorage("jwt", null);
+  const { userToken, setUserToken } = useContext(UserContext);
   const [expenses, setExpenses] = useState([]);
 
   const createExpense = async (expenseData: {
@@ -24,7 +24,7 @@ const Expenses: NextPage = () => {
   }) => {
     const response = await fetch("/api/expenses", {
       method: "POST",
-      headers: { Authorization: "Bearer " + user },
+      headers: { Authorization: "Bearer " + userToken },
       body: JSON.stringify(expenseData),
     });
     if (!response.ok) return;
@@ -50,14 +50,14 @@ const Expenses: NextPage = () => {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!userToken) {
       router.push("/log-in");
       return;
     }
 
     async function getExpenses() {
       const response = await fetch("/api/expenses", {
-        headers: { Authorization: "Bearer " + user },
+        headers: { Authorization: "Bearer " + userToken },
       });
       if (!response.ok) return;
       const responseData = await response.json();
@@ -68,7 +68,7 @@ const Expenses: NextPage = () => {
       if (!data) return alert("No data");
       setExpenses(data);
     });
-  }, [user, router]);
+  }, [userToken, router]);
 
   return (
     <div className="Expenses">
@@ -119,14 +119,7 @@ const Expenses: NextPage = () => {
               date?: Date;
             },
             index
-          ) => (
-            <Expense
-              expenseId={expense._id}
-              key={index}
-              {...expense}
-              user={user!}
-            />
-          )
+          ) => <Expense expenseId={expense._id} key={index} {...expense} />
         )
       ) : (
         <p>No expense data</p>

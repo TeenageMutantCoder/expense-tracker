@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import {
@@ -9,11 +9,11 @@ import {
   Heading,
   Input,
 } from "@chakra-ui/react";
-import { useLocalStorage } from "usehooks-ts";
+import UserContext from "components/UserContext";
 
 const SignUp: NextPage = () => {
   const router = useRouter();
-  const [user, setUser] = useLocalStorage("jwt", null);
+  const { userToken, setUserToken } = useContext(UserContext);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,16 +34,16 @@ const SignUp: NextPage = () => {
       .then((data) => {
         const jwt = data.data;
         if (jwt) {
-          setUser(jwt);
+          setUserToken(jwt);
         }
       });
   };
 
   useEffect(() => {
-    if (user) {
+    if (userToken) {
       router.push("/expenses");
     }
-  }, [user, router]);
+  }, [userToken, router]);
 
   return (
     <div className="Sign-Up">

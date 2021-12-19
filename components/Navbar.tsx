@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Spacer, Flex, Link } from "@chakra-ui/react";
-import { useLocalStorage } from "usehooks-ts";
+import UserContext from "components/UserContext";
 
 function Navbar() {
-  const [user, setUser] = useLocalStorage("jwt", null);
+  const { userToken, setUserToken } = useContext(UserContext);
   return (
     <Box bg="gray.100" p={3}>
       <Flex>
@@ -14,8 +14,8 @@ function Navbar() {
           Expenses
         </Link>
         <Spacer />
-        {user ? (
-          <Link onClick={() => setUser(null)} mx={1}>
+        {userToken ? (
+          <Link onClick={() => setUserToken(null)} mx={1}>
             Log Out
           </Link>
         ) : (
