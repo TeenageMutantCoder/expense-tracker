@@ -52,6 +52,7 @@ const Expenses: NextPage = () => {
   useEffect(() => {
     if (!user) {
       router.push("/log-in");
+      return;
     }
 
     async function getExpenses() {
@@ -130,14 +131,6 @@ const Expenses: NextPage = () => {
       ) : (
         <p>No expense data</p>
       )}
-
-      <Button
-        onClick={(e) => {
-          setUser(null);
-        }}
-      >
-        Clear data
-      </Button>
     </div>
   );
 };

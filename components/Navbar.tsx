@@ -1,7 +1,9 @@
 import React from "react";
 import { Box, Spacer, Flex, Link } from "@chakra-ui/react";
+import { useLocalStorage } from "usehooks-ts";
 
 function Navbar() {
+  const [user, setUser] = useLocalStorage("jwt", null);
   return (
     <Box bg="gray.100" p={3}>
       <Flex>
@@ -12,12 +14,20 @@ function Navbar() {
           Expenses
         </Link>
         <Spacer />
-        <Link href="/log-in" mx={1}>
-          Log In
-        </Link>
-        <Link href="/sign-up" mx={1}>
-          Sign Up
-        </Link>
+        {user ? (
+          <Link onClick={() => setUser(null)} mx={1}>
+            Log Out
+          </Link>
+        ) : (
+          <>
+            <Link href="/log-in" mx={1}>
+              Log In
+            </Link>
+            <Link href="/sign-up" mx={1}>
+              Sign Up
+            </Link>
+          </>
+        )}
       </Flex>
     </Box>
   );
