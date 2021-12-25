@@ -1,34 +1,28 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# expense-tracker
 
-## Getting Started
+Built with Next.js and TypeScript, this is a web application made to help people manage their money. I built this because it seemed like a useful project, but I also built it to learn full-stack web development, Next.js, and TypeScript.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+- [x] Create, read, edit, and delete expenses.
+- [ ] Filter expenses by custom tags.
+- [ ] Sorting expenses by date, name, and cost.
+- [ ] Visualize spending by tag over a period of time.
+- [ ] Export/print expense data as CSV or PDF.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How To Run
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### From Live Website
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Not yet available.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### From Source Code
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Open a terminal.
+2. Clone the repository with the command `git clone https://github.com/TeenageMutantCoder/expense-tracker.git`.
+3. Change into the respository directory with the command `cd expense-tracker`.
+4. Install dependencies with the command `npm install` **Note: Must have Node installed** or `yarn install` **Note: Must have Yarn installed**.
+5. Copy the contents from .env.local.example into a .env.local file using the command `cp .env.local.example .env.local` or `copy .env.local.example .env.local`.
+6. Edit the contents of .env.local to match your needs.
+7. Run the development server with the command `npm run dev` or `yarn dev`.
+8. Go to [http://localhost:3000](http://localhost:3000) or [http://127.0.0.1:3000](http://127.0.0.1:3000) to view the site.
