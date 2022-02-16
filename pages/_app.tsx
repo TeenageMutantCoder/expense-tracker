@@ -1,18 +1,16 @@
 import "styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
-import { useLocalStorage } from "usehooks-ts";
-import UserContext from "components/UserContext";
-import Navbar from "components/Navbar";
+import { AuthProvider } from "../contexts/AuthContext";
+import Navbar from "../components/Navbar";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [userToken, setUserToken] = useLocalStorage("jwt", null);
   return (
     <ChakraProvider>
-      <UserContext.Provider value={{ userToken, setUserToken }}>
+      <AuthProvider>
         <Navbar />
         <Component {...pageProps} />
-      </UserContext.Provider>
+      </AuthProvider>
     </ChakraProvider>
   );
 }

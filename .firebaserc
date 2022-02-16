@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "expense-tracker---dev",
+    "prod": "expense-tracker---prod"
+  }
+}

@@ -1,59 +1,80 @@
 import type { NextPage } from "next";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
   Button,
+  Center,
+  CloseButton,
   Container,
   FormControl,
   FormLabel,
   Heading,
   Input,
+  Link,
+  Text,
 } from "@chakra-ui/react";
-import UserContext from "components/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const LogIn: NextPage = () => {
   const router = useRouter();
-  const { userToken, setUserToken } = useContext(UserContext);
+  const { currentUser, login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const username = form.username.value;
+    const email = form.email.value;
     const password = form.password.value;
-    const reqBody = JSON.stringify({ username, password });
-    fetch("/api/log-in", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: reqBody,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const jwt = data.data;
-        if (jwt) {
-          setUserToken(jwt);
-        }
+
+    if (!login) return;
+
+    setError("");
+    setIsLoading(true);
+    login(email, password)
+      .catch((error) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
   useEffect(() => {
-    if (userToken) {
+    if (currentUser) {
       router.push("/expenses");
     }
-  }, [userToken, router]);
+  }, [currentUser, router]);
 
   return (
     <div className="Home">
+      {error && (
+        <Alert status="error">
+          <AlertIcon />
+          <AlertTitle mr={2}>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+          <CloseButton
+            onClick={() => setError("")}
+            position="absolute"
+            right="8px"
+            top="8px"
+          />
+        </Alert>
+      )}
       <Heading align="center">Log In</Heading>
       <Container>
         <form onSubmit={onSubmit}>
-          <FormControl id="username" isRequired>
-            <FormLabel>Username</FormLabel>
+          <FormControl id="email" isRequired>
+            <FormLabel>Email</FormLabel>
             <Input
-              type="text"
-              autoComplete="username"
-              placeholder="Please enter your username"
+              type="email"
+              autoComplete="email"
+              placeholder="Please enter your email"
             />
           </FormControl>
           <FormControl id="password" isRequired>
@@ -64,10 +85,22 @@ const LogIn: NextPage = () => {
               placeholder="Please enter your password"
             />
           </FormControl>
-          <Button mt={2} colorScheme="teal" variant="solid" type="submit">
+          <Button
+            disabled={isLoading}
+            mt={2}
+            colorScheme="teal"
+            variant="solid"
+            type="submit"
+          >
             Log In
           </Button>
         </form>
+        <Center>
+          <Text mr={3}>Don&apos;t have an account?</Text>
+          <NextLink href="/sign-up" passHref>
+            <Link>Sign Up</Link>
+          </NextLink>
+        </Center>
       </Container>
     </div>
   );

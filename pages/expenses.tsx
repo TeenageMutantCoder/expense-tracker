@@ -1,77 +1,106 @@
 import type { NextPage } from "next";
+import type { ExpenseFromDB, StrictExpenseWithUid } from "../lib/db";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
   Button,
+  CloseButton,
   Heading,
   FormControl,
   FormLabel,
   Input,
 } from "@chakra-ui/react";
-import Expense from "components/Expense";
-import UserContext from "components/UserContext";
+import Expense from "../components/Expense";
+import { useAuth } from "../contexts/AuthContext";
+import { createExpense, deleteExpense, updateExpense } from "../lib/db";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { auth, db } from "lib/firebase";
 
 const Expenses: NextPage = () => {
   const router = useRouter();
-  const { userToken, setUserToken } = useContext(UserContext);
-  const [expenses, setExpenses] = useState([]);
-
-  const createExpense = async (expenseData: {
-    name?: string;
-    cost: number;
-    date?: Date;
-    tags?: string[];
-  }) => {
-    const response = await fetch("/api/expenses", {
-      method: "POST",
-      headers: { Authorization: "Bearer " + userToken },
-      body: JSON.stringify(expenseData),
-    });
-    if (!response.ok) return;
-    const responseData = await response.json();
-    return responseData.data; // Returns new expense
-  };
+  const { currentUser } = useAuth();
+  const [expenses, setExpenses] = useState<StrictExpenseWithUid[]>([]);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const name = form.expenseName.value || undefined;
+    const name = form.expenseName.value || null;
     const cost = Number(form.expenseCost.value);
-    const date = form.expenseDate.value || undefined;
-    let tags = form.expenseTags.value || undefined;
+    let date = form.expenseDate.valueAsDate || null;
+    let tags = form.expenseTags.value || null;
+
+    // If date is not null, sets date (currently based off UTC) to be based on local time.
+    if (date) {
+      const localDate = new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate()
+      );
+      date = localDate;
+    }
+
+    // If tags is not null, separates tags by commas and removes extra spaces
     if (tags) {
-      // Separates tags by commas and removes extra spaces
       tags = tags.split(",").map((tag: string) => tag.trim());
     }
-    // Filter out undefined properties
-    const expenseData = JSON.parse(JSON.stringify({ name, cost, date, tags }));
-    createExpense(expenseData);
-    window.location.reload();
+
+    const expenseData = { name, cost, date, tags };
+    createExpense(expenseData).then(() => form.reset());
   };
 
   useEffect(() => {
-    if (!userToken) {
+    if (!currentUser) {
       router.push("/log-in");
       return;
     }
 
-    async function getExpenses() {
-      const response = await fetch("/api/expenses", {
-        headers: { Authorization: "Bearer " + userToken },
-      });
-      if (!response.ok) return;
-      const responseData = await response.json();
-      return responseData.data;
-    }
+    const userExpensesQuery = query(
+      collection(db, "expenses"),
+      where("userId", "==", auth.currentUser?.uid)
+    );
 
-    getExpenses().then((data) => {
-      if (!data) return alert("No data");
-      setExpenses(data);
+    const unsubscribe = onSnapshot(userExpensesQuery, (querySnapshot) => {
+      let expensesData: StrictExpenseWithUid[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const { date, ...rest } = doc.data() as ExpenseFromDB;
+        const expenseData: StrictExpenseWithUid = {
+          uid: doc.id,
+          date: date && date.toDate(),
+          ...rest,
+        };
+        expensesData.push(expenseData);
+      });
+
+      setExpenses(expensesData);
     });
-  }, [userToken, router]);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentUser, router]);
 
   return (
     <div className="Expenses">
+      {error && (
+        <Alert status="error">
+          <AlertIcon />
+          <AlertTitle mr={2}>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+          <CloseButton
+            onClick={() => setError("")}
+            position="absolute"
+            right="8px"
+            top="8px"
+          />
+        </Alert>
+      )}
       <Heading align="center">Expenses</Heading>
       <form autoComplete="off" onSubmit={onSubmit}>
         <FormControl id="expenseName">
@@ -92,7 +121,7 @@ const Expenses: NextPage = () => {
         </FormControl>
         <FormControl id="expenseDate">
           <FormLabel>Date</FormLabel>
-          <Input type="date" />
+          <Input type="date" pattern="\d{4}-\d{2}-\d{2}" />
         </FormControl>
         <FormControl id="expenseTags">
           <FormLabel>Tags</FormLabel>
@@ -101,26 +130,34 @@ const Expenses: NextPage = () => {
             placeholder="Please enter tags separated by commas (ex: Household, Office, Furniture)"
           />
         </FormControl>
-        <Button m={2} colorScheme="teal" variant="solid" type="submit">
+        <Button
+          disabled={isLoading}
+          m={2}
+          colorScheme="teal"
+          variant="solid"
+          type="submit"
+        >
           Create Expense
         </Button>
-        <Button m={2} colorScheme="teal" variant="outline" type="reset">
+        <Button
+          disabled={isLoading}
+          m={2}
+          colorScheme="teal"
+          variant="outline"
+          type="reset"
+        >
           Clear Data
         </Button>
       </form>
       {expenses.length ? (
-        expenses.map(
-          (
-            expense: {
-              _id: string;
-              cost: number;
-              name?: string;
-              tags?: string[];
-              date?: Date;
-            },
-            index
-          ) => <Expense expenseId={expense._id} key={index} {...expense} />
-        )
+        expenses.map(({ uid, ...rest }: StrictExpenseWithUid) => (
+          <Expense
+            key={uid}
+            editExpense={(expenseData) => updateExpense(uid, expenseData)}
+            deleteExpense={() => deleteExpense(uid)}
+            {...rest}
+          />
+        ))
       ) : (
         <p>No expense data</p>
       )}

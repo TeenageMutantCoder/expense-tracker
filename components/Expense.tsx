@@ -1,66 +1,71 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
-import UserContext from "components/UserContext";
+import { Expense } from "../lib/db";
+
 interface IProps {
-  expenseId: string;
-  name?: string;
+  name: string | null;
   cost: number;
-  date?: Date;
-  tags?: string[];
+  date: Date | null;
+  tags: string[] | null;
+  deleteExpense: () => Promise<void>;
+  editExpense: (expenseData: Expense) => Promise<void>;
 }
 
-function Expense({ expenseId, name, cost, date, tags }: IProps) {
-  const { userToken } = useContext(UserContext);
+function Expense({
+  name,
+  cost,
+  date,
+  tags,
+  deleteExpense,
+  editExpense,
+}: IProps) {
   const [showEditForm, setShowEditForm] = useState(false);
 
-  const deleteExpense = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const response = await fetch(`/api/expenses/${expenseId}`, {
-      method: "DELETE",
-      headers: { Authorization: "Bearer " + userToken },
-    });
-    if (!response.ok) return;
-    const responseData = await response.json();
-    if (!responseData.data) return alert("Failed to delete expense.");
-    window.location.reload();
-  };
+  const getProperDateFormat = (date: Date | null) => {
+    if (!date) return "";
 
-  const editExpense = async (expenseData: {
-    name: string | undefined;
-    cost: number;
-    date: Date | undefined;
-    tags: string[] | undefined;
-  }) => {
-    const response = await fetch(`/api/expenses/${expenseId}`, {
-      method: "PATCH",
-      headers: { Authorization: "Bearer " + userToken },
-      body: JSON.stringify(expenseData),
-    });
-    if (!response.ok) return;
-    const responseData = await response.json();
-    return responseData.data; // Returns old expense
+    const year = date.getFullYear().toString().padStart(4, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+
+    return [year, month, day].join("-");
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const name = form.expenseName.value || undefined;
+    const name = form.expenseName.value || null;
     const cost = Number(form.expenseCost.value);
-    const date = form.expenseDate.value || undefined;
-    let tags = form.expenseTags.value || undefined;
+    let date = form.expenseDate.valueAsDate || null;
+    let tags = form.expenseTags.value || null;
+
+    // If date is not null, sets date (currently based off UTC) to be based on local time.
+    if (date) {
+      const localDate = new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate()
+      );
+      date = localDate;
+    }
+
+    // If tags is not null, separates tags by commas and removes extra spaces
     if (tags) {
-      // Separates tags by commas and removes extra spaces
       tags = tags.split(",").map((tag: string) => tag.trim());
     }
+
     const expenseData = { name, cost, date, tags };
-    editExpense(expenseData);
-    window.location.reload();
+    editExpense(expenseData).then(() => {
+      form.reset();
+      setShowEditForm(false);
+    });
   };
 
   return (
     <div className="Expense">
       <h3>Name: {name}</h3>
       <p>Cost: {cost}</p>
-      <p>Date: {date && new Date(date).toDateString()}</p>
+      <p>Date: {date?.toDateString()}</p>
       <p>Tags: {tags?.join(", ")}</p>
       <Button
         ml={2}
@@ -85,7 +90,7 @@ function Expense({ expenseId, name, cost, date, tags }: IProps) {
             <Input
               type="text"
               placeholder="Please enter the name of the expense"
-              defaultValue={name}
+              defaultValue={name ?? undefined}
             />
           </FormControl>
           <FormControl id="expenseCost" isRequired>
@@ -95,12 +100,16 @@ function Expense({ expenseId, name, cost, date, tags }: IProps) {
               min={0.01}
               step={0.01}
               placeholder="Please enter the cost of the expense"
-              defaultValue={cost}
+              defaultValue={cost ?? undefined}
             />
           </FormControl>
           <FormControl id="expenseDate">
             <FormLabel>Date</FormLabel>
-            <Input type="date" defaultValue={String(date)} />
+            <Input
+              type="date"
+              pattern="\d{4}-\d{2}-\d{2}"
+              defaultValue={getProperDateFormat(date)}
+            />
           </FormControl>
           <FormControl id="expenseTags">
             <FormLabel>Tags</FormLabel>
@@ -113,8 +122,14 @@ function Expense({ expenseId, name, cost, date, tags }: IProps) {
           <Button m={2} colorScheme="teal" variant="solid" type="submit">
             Edit Expense
           </Button>
-          <Button m={2} colorScheme="teal" variant="outline" type="reset">
-            Reset
+          <Button
+            m={2}
+            colorScheme="teal"
+            variant="outline"
+            type="reset"
+            onClick={() => setShowEditForm(false)}
+          >
+            Cancel
           </Button>
         </form>
       )}

@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Box, Spacer, Flex, Link } from "@chakra-ui/react";
-import UserContext from "components/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 
 function Navbar() {
-  const { userToken, setUserToken } = useContext(UserContext);
+  const { currentUser, logout } = useAuth();
+
   return (
     <Box bg="gray.100" p={3}>
       <Flex>
@@ -14,8 +15,8 @@ function Navbar() {
           Expenses
         </Link>
         <Spacer />
-        {userToken ? (
-          <Link onClick={() => setUserToken(null)} mx={1}>
+        {currentUser ? (
+          <Link onClick={logout} mx={1}>
             Log Out
           </Link>
         ) : (
