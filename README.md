@@ -22,7 +22,6 @@ Not yet available.
 2. Clone the repository with the command `git clone https://github.com/TeenageMutantCoder/expense-tracker.git`.
 3. Change into the respository directory with the command `cd expense-tracker`.
 4. Install dependencies with the command `npm install` **Note: Must have Node installed** or `yarn install` **Note: Must have Yarn installed**.
-5. Copy the contents from .env.local.example into a .env.local file using the command `cp .env.local.example .env.local` or `copy .env.local.example .env.local`.
-6. Edit the contents of .env.local to match your needs.
-7. Run the development server with the command `npm run dev` or `yarn dev`.
-8. Go to [http://localhost:3000](http://localhost:3000) or [http://127.0.0.1:3000](http://127.0.0.1:3000) to view the site.
+5. Edit the contents of .env.local to match your needs.
+6. Run the development server with the command `npm run dev` or `yarn dev`.
+7. Go to [http://localhost:3000](http://localhost:3000) or [http://127.0.0.1:3000](http://127.0.0.1:3000) to view the site.
