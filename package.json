@@ -1,5 +1,5 @@
 {
-  "name": "client2",
+  "name": "expense-tracker",
   "private": true,
   "scripts": {
     "dev": "next dev",
