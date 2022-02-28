@@ -20,6 +20,7 @@ function Expense({
   editExpense,
 }: IProps) {
   const [showEditForm, setShowEditForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getProperDateFormat = (date: Date | null) => {
     if (!date) return "";
@@ -55,10 +56,14 @@ function Expense({
     }
 
     const expenseData = { name, cost, date, tags };
-    editExpense(expenseData).then(() => {
-      form.reset();
-      setShowEditForm(false);
-    });
+    setIsLoading(true);
+    editExpense(expenseData)
+      .then(() => {
+        form.reset();
+        setShowEditForm(false);
+      })
+      .catch((error) => alert(error.message))
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -71,7 +76,13 @@ function Expense({
         ml={2}
         colorScheme="red"
         variant="outline"
-        onClick={deleteExpense}
+        onClick={() => {
+          setIsLoading(true);
+          deleteExpense()
+            .catch((error) => alert(error.message))
+            .finally(() => setIsLoading(false));
+        }}
+        disabled={isLoading}
       >
         Delete
       </Button>
@@ -80,6 +91,7 @@ function Expense({
         colorScheme="red"
         variant="outline"
         onClick={() => setShowEditForm(!showEditForm)}
+        disabled={isLoading}
       >
         Edit
       </Button>

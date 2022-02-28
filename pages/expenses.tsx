@@ -50,8 +50,12 @@ const Expenses: NextPage = () => {
       tags = tags.split(",").map((tag: string) => tag.trim());
     }
 
+    setIsLoading(true);
     const expenseData = { name, cost, date, tags };
-    createExpense(expenseData).then(() => form.reset());
+    createExpense(expenseData)
+      .then(() => form.reset())
+      .catch((error) => setError(error.message))
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
