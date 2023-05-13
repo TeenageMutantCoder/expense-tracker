@@ -1,5 +1,7 @@
 # expense-tracker
 
+Update 5/13/2023: This project is not currently in a working state and I don't feel like updating it. Back when I set it up to use Firebase, I seem to have forgotten to update some things, and I have just deleted the Firebase project because I found that I committed API keys LOL.
+
 Built with Next.js and TypeScript, this is a web application made to help people manage their money. I built this because it seemed like a useful project, but I also built it to learn full-stack web development, Next.js, and TypeScript.
 
 ## Features
